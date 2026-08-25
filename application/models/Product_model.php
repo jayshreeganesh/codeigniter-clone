@@ -14,6 +14,7 @@ class Product_model extends CI_Model {
 
     public function insert_product(array $data) {
         return $this->db->insert($this->table, [
+            'user_id'     => $data['user_id'] ?? 1,
             'name'        => $data['name'],
             'sku'         => $data['sku'],
             'price'       => $data['price'],
@@ -24,6 +25,7 @@ class Product_model extends CI_Model {
 
     public function update_product(int $id, array $data) {
         return $this->db->update($this->table, [
+            'user_id'     => $data['user_id'] ?? 1,
             'name'        => $data['name'],
             'sku'         => $data['sku'],
             'price'       => $data['price'],

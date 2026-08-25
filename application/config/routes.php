@@ -15,3 +15,8 @@ return [
     'products/update/(:num)' => 'products/update/$1',
     'products/delete/(:num)' => 'products/delete/$1',
 ];
+
+$route['login'] = 'auth/login';
+$route['register'] = 'auth/register';
+$route['logout'] = 'auth/logout';
+$route['products/export'] = 'products/export';
