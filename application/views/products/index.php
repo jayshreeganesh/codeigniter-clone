@@ -2,18 +2,28 @@
     <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-800">Products Catalog</h1>
-            <p class="text-sm text-slate-500 mt-1">Laravel-style MVC & Eloquent Active Record</p>
+            <p class="text-sm text-slate-500 mt-1">CodeIgniter MVC</p>
         </div>
         <div class="flex gap-2">
-            <?php if(isset($_SESSION['user_id'])): ?>
-                <span class="px-4 py-2 text-sm text-slate-600 font-bold bg-slate-100 rounded-lg">Welcome, <?= htmlspecialchars($_SESSION['user_name']) ?></span>
-                <a href="<?= site_url('logout') ?>" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">Logout</a>
+            <?php if($this->session->userdata('user_id')): ?>
+                <span class="px-4 py-2 text-sm text-slate-600 font-bold bg-slate-100 rounded-lg">Welcome, <?= htmlspecialchars($this->session->userdata('user_name')) ?></span>
+                <a href="/auth/logout" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">Logout</a>
             <?php else: ?>
                 <a href="/login" class="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg shadow-sm transition">Login</a>
                 <a href="/register" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">Register</a>
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if($this->session->userdata('role') === 'admin'): ?>
+    <!-- Admin Controls -->
+    <div class="bg-indigo-50 border-b border-indigo-100 px-6 py-3 flex gap-3 text-sm">
+        <span class="font-bold text-indigo-800 flex items-center mr-2"><i class="fa-solid fa-shield-halved mr-2"></i> Admin Tools:</span>
+        <a href="/manage_db.php?action=seed" class="text-indigo-600 hover:text-indigo-800 bg-white px-3 py-1 rounded border border-indigo-200" onclick="return confirm('Seed demo data?');">Seed Data</a>
+        <a href="/manage_db.php?action=reset" class="text-rose-600 hover:text-rose-800 bg-white px-3 py-1 rounded border border-rose-200" onclick="return confirm('Warning: This deletes all products and resets the database. Continue?');">Reset DB</a>
+        <a href="/build_zip.php" class="text-emerald-600 hover:text-emerald-800 bg-white px-3 py-1 rounded border border-emerald-200">Download .zip</a>
+    </div>
+    <?php endif; ?>
     <?php if (!empty($products) || !empty($q)): ?>
     <!-- Search Bar -->
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
@@ -37,9 +47,18 @@
             <?php endif; ?>
         </div>
         <?php if (!empty($products) || !empty($q)): ?>
+                <?php if (!isset($trash) || !$trash): ?>
+        <a href="<?= site_url('products') ?>?trash=1" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-trash mr-2"></i> View Trash
+        </a>
         <a href="<?= site_url('products/create') ?>" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
             <i class="fa-solid fa-plus mr-2"></i> Add Product
         </a>
+        <?php else: ?>
+        <a href="<?= site_url('products') ?>" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Back to Products
+        </a>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
         
@@ -73,6 +92,9 @@
                         <th class="py-3.5 px-6">SKU</th>
                         <th class="py-3.5 px-6"><a href="?sort=price&dir=<?= ($sort=='price' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? '' ?>">Price <i class="fa-solid fa-sort ml-1"></i></a></th>
                         <th class="py-3.5 px-6">Stock</th>
+                                                <?php if($this->session->userdata('role') === 'admin'): ?>
+                        <th class="py-3.5 px-6">Creator</th>
+                        <?php endif; ?>
                         <th class="py-3.5 px-6 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -82,8 +104,17 @@
                             <td class="py-4 px-6 font-medium text-slate-400">#<?= $product->id ?></td>
                             <td class="py-4 px-6">
                                 <a href="<?= site_url('products/' . $product->id) ?>" class="font-semibold text-slate-800 hover:text-red-600 transition">
-                                    <?= htmlspecialchars($product->name) ?>
+                                    <?<?= htmlspecialchars($product->name) ?>
                                 </a>
+                                <?php if (!isset($trash) || !$trash): ?>
+                                    <?php if ($product->is_active ?? 1): ?>
+                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+                                    <?php else: ?>
+                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">Inactive</span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-800">Deleted</span>
+                                <?php endif; ?>
                                 <?php if (!empty($product->description)): ?>
                                     <p class="text-xs text-slate-400 mt-0.5 truncate max-w-xs"><?= htmlspecialchars($product->description) ?></p>
                                 <?php endif; ?>
@@ -105,19 +136,38 @@
                                     </span>
                                 <?php endif; ?>
                             </td>
+                                                        <?php if($this->session->userdata('role') === 'admin'): ?>
+                            <td class="py-4 px-6 text-sm text-slate-500">
+                                <?= htmlspecialchars($product->creator_email ?? 'Unknown') ?>
+                            </td>
+                            <?php endif; ?>
                             <td class="py-4 px-6 text-right space-x-2 whitespace-nowrap">
-                                <a href="<?= site_url('products/' . $product->id) ?>" class="inline-flex items-center p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition" title="Show">
-                                    <i class="fa-regular fa-eye"></i>
-                                </a>
-                                <a href="<?= site_url('products/' . $product->id . '/edit') ?>" class="inline-flex items-center p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded transition" title="Edit">
-                                    <i class="fa-regular fa-pen-to-square"></i>
-                                </a>
-                                <form action="<?= site_url('products/' . $product->id . '/delete') ?>" method="POST" class="inline-block" onsubmit="return confirm('Delete this product?');">
-                                    <?= csrf_field() ?>
-                                    <button type="submit" class="inline-flex items-center p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded transition" title="Delete">
-                                        <i class="fa-regular fa-trash-can"></i>
-                                    </button>
-                                </form>
+                                <?php if (!isset($trash) || !$trash): ?>
+                                    <form action="<?= site_url('products/toggle_active/' . $product->id) ?>" method="POST" class="inline-block">
+                                        <button type="submit" class="inline-flex items-center p-1.5 <?= ($product->is_active ?? 1) ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50' ?> rounded transition" title="<?= ($product->is_active ?? 1) ? 'Deactivate' : 'Activate' ?>">
+                                            <i class="fa-solid <?= ($product->is_active ?? 1) ? 'fa-pause' : 'fa-play' ?>"></i>
+                                        </button>
+                                    </form>
+                                    <a href="<?= site_url('products/edit/' . $product->id) ?>" class="inline-flex items-center p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded transition" title="Edit">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                                    <form action="<?= site_url('products/delete/' . $product->id) ?>" method="POST" class="inline-block" onsubmit="return confirm('Move this product to trash?');">
+                                        <button type="submit" class="inline-flex items-center p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded transition" title="Trash">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <form action="<?= site_url('products/restore/' . $product->id) ?>" method="POST" class="inline-block">
+                                        <button type="submit" class="inline-flex items-center p-1.5 text-emerald-600 hover:bg-emerald-50 rounded transition" title="Restore">
+                                            <i class="fa-solid fa-arrow-rotate-left"></i>
+                                        </button>
+                                    </form>
+                                    <form action="<?= site_url('products/force_delete/' . $product->id) ?>" method="POST" class="inline-block" onsubmit="return confirm('WARNING: Permanently delete this product? This cannot be undone!');">
+                                        <button type="submit" class="inline-flex items-center p-1.5 text-rose-600 hover:bg-rose-50 rounded transition" title="Hard Delete">
+                                            <i class="fa-solid fa-eraser"></i>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

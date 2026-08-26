@@ -1,4 +1,6 @@
 <?php
+if (!file_exists(__DIR__ . '/install.lock')) { header('Location: /install.php'); exit; }
+
 /**
  * CodeIgniter Clone - Front Controller
  * Zero dependency / Ultra-low Inode MVC Application
