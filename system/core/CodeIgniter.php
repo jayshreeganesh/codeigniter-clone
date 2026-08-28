@@ -15,6 +15,10 @@ class CI_Benchmark {
 }
 
 class CI_Input {
+    public function method($upper = false) {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        return $upper ? strtoupper($method) : strtolower($method);
+    }
     public function post($key = null, $default = null) {
         if ($key === null) return $_POST;
         return isset($_POST[$key]) ? (is_string($_POST[$key]) ? trim($_POST[$key]) : $_POST[$key]) : $default;
@@ -196,7 +200,9 @@ class CI_Loader {
         $this->controller = $controller;
     }
 
-    public function view(string $view, array $data = [], bool $return = false) {
+    public function library($lib) { return true; }
+    public function helper($helper) { return true; }
+        public function view(string $view, array $data = [], bool $return = false) {
         $filePath = APPPATH . 'views/' . ltrim($view, '/') . '.php';
         if (!file_exists($filePath)) {
             throw new Exception("View not found: " . $filePath);

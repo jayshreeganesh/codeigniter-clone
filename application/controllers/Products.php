@@ -120,6 +120,3 @@ class Products extends CI_Controller {
         redirect('products');
     }
 }
-        redirect('products');
-    }
-}

@@ -1,0 +1,23 @@
+{
+  "name": "codeigniter-clone",
+  "version": "1.0.0",
+  "description": "A lightweight CodeIgniter 3/4 style MVC CRUD application crafted specifically for shared/free hosting environments (e.g. **InfinityFree**, **Aeon**, cPanel) where strict inode (file count) limits exist.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jayshreeganesh/codeigniter-clone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jayshreeganesh/codeigniter-clone/issues"
+  },
+  "homepage": "https://github.com/jayshreeganesh/codeigniter-clone#readme",
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}
