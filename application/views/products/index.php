@@ -46,8 +46,7 @@
                 </a>
             <?php endif; ?>
         </div>
-        <?php if (!empty($products) || !empty($q)): ?>
-                <?php if (!isset($trash) || !$trash): ?>
+        <?php if (!isset($trash) || !$trash): ?>
         <a href="<?= site_url('products') ?>?trash=1" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">
             <i class="fa-solid fa-trash mr-2"></i> View Trash
         </a>
@@ -58,7 +57,6 @@
         <a href="<?= site_url('products') ?>" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">
             <i class="fa-solid fa-arrow-left mr-2"></i> Back to Products
         </a>
-        <?php endif; ?>
         <?php endif; ?>
     </div>
         
@@ -176,3 +174,4 @@
         </div>
     <?php endif; ?>
 </div>
+

@@ -44,8 +44,14 @@ class CI_Session {
         }
         return $val;
     }
-    public function set_userdata($key, $value) {
-        $_SESSION[$key] = $value;
+    public function set_userdata($key, $value = null) {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $_SESSION[$k] = $v;
+            }
+        } else {
+            $_SESSION[$key] = $value;
+        }
     }
     public function userdata($key = null) {
         return $key === null ? $_SESSION : ($_SESSION[$key] ?? null);
@@ -60,6 +66,10 @@ class CI_DB {
     protected string $orderBy = '';
     protected ?int $limit = null;
     protected ?int $offset = null;
+
+    public function insert_id() {
+        return self::$pdo->lastInsertId();
+    }
 
     public function __construct() {
         if (self::$pdo === null) {
@@ -141,8 +151,12 @@ class CI_DB {
                 $this->bindings[] = $v;
             }
         } else {
-            $this->wheres[] = "{$key} = ?";
-            $this->bindings[] = $val;
+            if ($val === null && strpos($key, ' ') !== false) {
+                $this->wheres[] = $key;
+            } else {
+                $this->wheres[] = "{$key} = ?";
+                $this->bindings[] = $val;
+            }
         }
         return $this;
     }
@@ -198,6 +212,10 @@ class CI_Loader {
 
     public function __construct(CI_Controller $controller) {
         $this->controller = $controller;
+    }
+
+    public function __get($key) {
+        return $this->controller->$key;
     }
 
     public function library($lib) { return true; }
@@ -317,3 +335,4 @@ class CodeIgniter {
         call_user_func_array([$controller, $method], $params);
     }
 }
+

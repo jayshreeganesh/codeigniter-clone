@@ -111,6 +111,30 @@ class Products extends CI_Controller {
         }
         redirect('products?trash=1');
     }
+    public function edit($id) {
+        $prod = $this->Product_model->get_products($id);
+        if (!$prod || ($this->session->userdata('role') !== 'admin' && $prod->user_id != $this->session->userdata('user_id'))) {
+            redirect('products');
+        }
+        $this->load->view('templates/header', ['title' => 'Edit Product']);
+        $this->load->view('products/edit', ['product' => $prod]);
+        $this->load->view('templates/footer');
+    }
+    public function update($id) {
+        $prod = $this->Product_model->get_products($id);
+        if (!$prod || ($this->session->userdata('role') !== 'admin' && $prod->user_id != $this->session->userdata('user_id'))) {
+            redirect('products');
+        }
+        $this->db->where('id', $id)->update('products', [
+            'name' => $this->input->post('name'),
+            'sku' => $this->input->post('sku'),
+            'price' => (float)$this->input->post('price'),
+            'stock' => (int)$this->input->post('stock'),
+            'description' => $this->input->post('description')
+        ]);
+        $this->session->set_flashdata('success', 'Product updated!');
+        redirect('products');
+    }
     public function toggle_active($id) {
         $prod = $this->Product_model->get_products($id);
         if ($prod && ($this->session->userdata('role') === 'admin' || $prod->user_id == $this->session->userdata('user_id'))) {

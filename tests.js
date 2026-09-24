@@ -41,14 +41,16 @@ const fs = require('fs');
         await page.goto(url + '/register', { waitUntil: 'networkidle' });
         await screenshot('register_page');
         await page.fill('input[name="name"]', 'Test Admin');
-        await page.fill('input[name="email"]', 'admin_e2e@test.local');
+        const testEmail = 'admin_e2e_' + Date.now() + '@test.local';
+        await page.fill('input[name="email"]', testEmail);
         await page.fill('input[name="password"]', 'password123');
         await page.click('button[type="submit"]');
         await page.waitForTimeout(1000);
         
         // Sometimes it logs in automatically, sometimes requires manual login. Check if we need to login.
         if (page.url().includes('/login')) {
-            await page.fill('input[name="email"]', 'admin_e2e@test.local');
+            const testEmail = 'admin_e2e_' + Date.now() + '@test.local';
+        await page.fill('input[name="email"]', testEmail);
             await page.fill('input[name="password"]', 'password123');
             await page.click('button[type="submit"]');
             await page.waitForTimeout(1000);
@@ -58,7 +60,7 @@ const fs = require('fs');
         await screenshot('dashboard_empty');
         
         // 4. Create Product
-        let createSelector = 'a[href*="/products/create"], a[href*="/products/add"]';
+        let createSelector = 'a[href*="products/create"], a[href*="products/add"]';
         const createBtn = await page.$(createSelector);
         if (createBtn) {
             await createBtn.click();
@@ -125,3 +127,5 @@ const fs = require('fs');
     await browser.close();
     console.log('Playwright E2E testing completed fully!');
 })();
+
+
